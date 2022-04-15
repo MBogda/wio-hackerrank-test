@@ -35,17 +35,9 @@ public class WeatherApiRestController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Nullable Date date,
             @RequestParam(required = false) @Nullable String city,
             @RequestParam(required = false) @Nullable String sort) {
-        List<String> cities = city != null
-                ? Arrays.asList(city.split(","))
-                : null;
 
-        if (sort != null && !sort.equals(SORT_DATE_ASC) && !sort.equals(SORT_DATE_DESC)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid `sort` parameter.");
-        }
-
-        Boolean orderByDate = sort != null
-                ? sort.equals(SORT_DATE_ASC)
-                : null;
+        Boolean orderByDate = convertSort(sort);
+        List<String> cities = convertCities(city);
 
         return weatherRepository.findWeatherFilteringDateAndCityOrderByDateAndId(date, cities, orderByDate);
     }
@@ -55,5 +47,21 @@ public class WeatherApiRestController {
         Optional<Weather> optionalWeather = weatherRepository.findById(id);
         return optionalWeather.orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    private Boolean convertSort(String sort) {
+        if (sort != null && !sort.equals(SORT_DATE_ASC) && !sort.equals(SORT_DATE_DESC)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid `sort` parameter.");
+        }
+
+        return sort != null
+                ? sort.equals(SORT_DATE_ASC)
+                : null;
+    }
+
+    private List<String> convertCities(String city) {
+        return city != null
+                ? Arrays.asList(city.split(","))
+                : null;
     }
 }
