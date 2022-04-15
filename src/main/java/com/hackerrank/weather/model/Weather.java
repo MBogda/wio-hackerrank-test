@@ -1,9 +1,6 @@
 package com.hackerrank.weather.model;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
@@ -11,15 +8,26 @@ import java.util.List;
 public class Weather {
     @Id
     @GeneratedValue
+    @Column(nullable = false)
     private Integer id;
+
+    @Column(nullable = false)
     private Date date;
 
+    @Column(nullable = false)
     private Float lat;
+
+    @Column(nullable = false)
     private Float lon;
+
+    @Column(nullable = false)
     private String city;
+
+    @Column(nullable = false)
     private String state;
 
     @ElementCollection
+    @Column(nullable = false)
     private List<Double> temperatures;
 
     public Weather(Integer id, Date date, Float lat, Float lon, String city, String state, List<Double> temperatures) {
