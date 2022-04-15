@@ -3,15 +3,21 @@ package com.hackerrank.weather.repository;
 import com.hackerrank.weather.model.Weather;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 public interface WeatherRepository extends JpaRepository<Weather, Integer> {
+
+    // no filter
+
     List<Weather> findByOrderByIdAsc();
 
     List<Weather> findByOrderByDateAscIdAsc();
 
     List<Weather> findByOrderByDateDescIdAsc();
+
+    // filter by date
 
     List<Weather> findByDateOrderByIdAsc(Date date);
 
@@ -19,15 +25,19 @@ public interface WeatherRepository extends JpaRepository<Weather, Integer> {
 
     List<Weather> findByDateOrderByDateDescIdAsc(Date date);
 
-    List<Weather> findByCityOrderByIdAsc(String city);
+    // filter by city
 
-    List<Weather> findByCityOrderByDateAscIdAsc(String city);
+    List<Weather> findByCityInIgnoreCaseOrderByIdAsc(Collection<String> city);
 
-    List<Weather> findByCityOrderByDateDescIdAsc(String city);
+    List<Weather> findByCityInIgnoreCaseOrderByDateAscIdAsc(Collection<String> city);
 
-    List<Weather> findByDateAndCityOrderByIdAsc(Date date, String city);
+    List<Weather> findByCityInIgnoreCaseOrderByDateDescIdAsc(Collection<String> city);
 
-    List<Weather> findByDateAndCityOrderByDateAscIdAsc(Date date, String city);
+    // filter by date and city
 
-    List<Weather> findByDateAndCityOrderByDateDescIdAsc(Date date, String city);
+    List<Weather> findByDateAndCityInIgnoreCaseOrderByIdAsc(Date date, Collection<String> city);
+
+    List<Weather> findByDateAndCityInIgnoreCaseOrderByDateAscIdAsc(Date date, Collection<String> city);
+
+    List<Weather> findByDateAndCityInIgnoreCaseOrderByDateDescIdAsc(Date date, Collection<String> city);
 }

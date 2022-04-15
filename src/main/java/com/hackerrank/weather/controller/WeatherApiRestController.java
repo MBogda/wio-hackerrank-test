@@ -9,6 +9,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -31,36 +32,51 @@ public class WeatherApiRestController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Nullable Date date,
             @RequestParam(required = false) @Nullable String city,
             @RequestParam(required = false) @Nullable String sort) {
-        // todo: proper city filtering
+        // todo: get rid of this ugly method
         if (sort == null) {
-            if (date != null && city != null) {
-                return weatherRepository.findByDateAndCityOrderByIdAsc(date, city);
-            } else if (date != null) {
-                return weatherRepository.findByDateOrderByIdAsc(date);
-            } else if (city != null) {
-                return weatherRepository.findByCityOrderByIdAsc(city);
+            if (city != null) {
+                List<String> cities = Arrays.asList(city.split(","));
+                if (date != null) {
+                    return weatherRepository.findByDateAndCityInIgnoreCaseOrderByIdAsc(date, cities);
+                } else {
+                    return weatherRepository.findByCityInIgnoreCaseOrderByIdAsc(cities);
+                }
             } else {
-                return weatherRepository.findByOrderByIdAsc();
+                if (date != null) {
+                    return weatherRepository.findByDateOrderByIdAsc(date);
+                } else {
+                    return weatherRepository.findByOrderByIdAsc();
+                }
             }
         } else if (sort.equals("date")) {
-            if (date != null && city != null) {
-                return weatherRepository.findByDateAndCityOrderByDateAscIdAsc(date, city);
-            } else if (date != null) {
-                return weatherRepository.findByDateOrderByDateAscIdAsc(date);
-            } else if (city != null) {
-                return weatherRepository.findByCityOrderByDateAscIdAsc(city);
+            if (city != null) {
+                List<String> cities = Arrays.asList(city.split(","));
+                if (date != null) {
+                    return weatherRepository.findByDateAndCityInIgnoreCaseOrderByDateAscIdAsc(date, cities);
+                } else {
+                    return weatherRepository.findByCityInIgnoreCaseOrderByDateAscIdAsc(cities);
+                }
             } else {
-                return weatherRepository.findByOrderByDateAscIdAsc();
+                if (date != null) {
+                    return weatherRepository.findByDateOrderByDateAscIdAsc(date);
+                } else {
+                    return weatherRepository.findByOrderByDateAscIdAsc();
+                }
             }
         } else if (sort.equals("-date")) {
-            if (date != null && city != null) {
-                return weatherRepository.findByDateAndCityOrderByDateDescIdAsc(date, city);
-            } else if (date != null) {
-                return weatherRepository.findByDateOrderByDateDescIdAsc(date);
-            } else if (city != null) {
-                return weatherRepository.findByCityOrderByDateDescIdAsc(city);
+            if (city != null) {
+                List<String> cities = Arrays.asList(city.split(","));
+                if (date != null) {
+                    return weatherRepository.findByDateAndCityInIgnoreCaseOrderByDateDescIdAsc(date, cities);
+                } else {
+                    return weatherRepository.findByCityInIgnoreCaseOrderByDateDescIdAsc(cities);
+                }
             } else {
-                return weatherRepository.findByOrderByDateDescIdAsc();
+                if (date != null) {
+                    return weatherRepository.findByDateOrderByDateDescIdAsc(date);
+                } else {
+                    return weatherRepository.findByOrderByDateDescIdAsc();
+                }
             }
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid `sort` parameter.");
