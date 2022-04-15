@@ -18,6 +18,9 @@ import java.util.Optional;
 @RequestMapping("/weather")
 public class WeatherApiRestController {
 
+    private static final String SORT_DATE_ASC = "date";
+    private static final String SORT_DATE_DESC = "-date";
+
     @Autowired
     private WeatherRepository weatherRepository;
 
@@ -32,55 +35,19 @@ public class WeatherApiRestController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @Nullable Date date,
             @RequestParam(required = false) @Nullable String city,
             @RequestParam(required = false) @Nullable String sort) {
-        // todo: get rid of this ugly method
-        if (sort == null) {
-            if (city != null) {
-                List<String> cities = Arrays.asList(city.split(","));
-                if (date != null) {
-                    return weatherRepository.findByDateAndCityInIgnoreCaseOrderByIdAsc(date, cities);
-                } else {
-                    return weatherRepository.findByCityInIgnoreCaseOrderByIdAsc(cities);
-                }
-            } else {
-                if (date != null) {
-                    return weatherRepository.findByDateOrderByIdAsc(date);
-                } else {
-                    return weatherRepository.findByOrderByIdAsc();
-                }
-            }
-        } else if (sort.equals("date")) {
-            if (city != null) {
-                List<String> cities = Arrays.asList(city.split(","));
-                if (date != null) {
-                    return weatherRepository.findByDateAndCityInIgnoreCaseOrderByDateAscIdAsc(date, cities);
-                } else {
-                    return weatherRepository.findByCityInIgnoreCaseOrderByDateAscIdAsc(cities);
-                }
-            } else {
-                if (date != null) {
-                    return weatherRepository.findByDateOrderByDateAscIdAsc(date);
-                } else {
-                    return weatherRepository.findByOrderByDateAscIdAsc();
-                }
-            }
-        } else if (sort.equals("-date")) {
-            if (city != null) {
-                List<String> cities = Arrays.asList(city.split(","));
-                if (date != null) {
-                    return weatherRepository.findByDateAndCityInIgnoreCaseOrderByDateDescIdAsc(date, cities);
-                } else {
-                    return weatherRepository.findByCityInIgnoreCaseOrderByDateDescIdAsc(cities);
-                }
-            } else {
-                if (date != null) {
-                    return weatherRepository.findByDateOrderByDateDescIdAsc(date);
-                } else {
-                    return weatherRepository.findByOrderByDateDescIdAsc();
-                }
-            }
-        } else {
+        List<String> cities = city != null
+                ? Arrays.asList(city.split(","))
+                : null;
+
+        if (sort != null && !sort.equals(SORT_DATE_ASC) && !sort.equals(SORT_DATE_DESC)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid `sort` parameter.");
         }
+
+        Boolean orderByDate = sort != null
+                ? sort.equals(SORT_DATE_ASC)
+                : null;
+
+        return weatherRepository.findWeatherFilteringDateAndCityOrderByDateAndId(date, cities, orderByDate);
     }
 
     @GetMapping("/{id}")
