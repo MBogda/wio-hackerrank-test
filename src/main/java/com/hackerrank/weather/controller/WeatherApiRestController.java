@@ -34,11 +34,8 @@ public class WeatherApiRestController {
 
     @GetMapping("/{id}")
     public Weather getWeatherById(@PathVariable Integer id) {
-        Optional<Weather> weather = weatherRepository.findById(id);
-        if (weather.isPresent()) {
-            return weather.get();
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+        Optional<Weather> optionalWeather = weatherRepository.findById(id);
+        return optionalWeather.orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 }
